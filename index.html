@@ -46,15 +46,18 @@
   .bubble {
     position: absolute;
     bottom: -120px;
-    padding: 12px 22px;
+    padding: 10px 20px;
     border-radius: 50px;
+    max-width: 75vw;
+    text-align: center;
     background: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
     border: 1px solid rgba(255, 255, 255, 0.25);
     color: #fff;
     font-size: 16px;
-    white-space: nowrap;
+    white-space: normal;
+    word-break: keep-all;
     pointer-events: auto;
     cursor: pointer;
     text-shadow: 0 0 12px rgba(255, 150, 180, 0.6);
@@ -207,7 +210,11 @@
     }
     .card h1 { font-size: 28px; }
     .card p.sub { font-size: 15px; }
-    .bubble { font-size: 14px; padding: 10px 16px; }
+    .bubble {
+      font-size: 14px;
+      padding: 8px 14px;
+      max-width: 68vw;
+    }
     .photo-popup img { width: 140px; height: 140px; }
   }
 </style>
@@ -441,12 +448,23 @@ function createBubble() {
 
   el.innerHTML = `<span class="bubble-text">${pair.msg}</span>`;
 
-  const left = Math.random() * 85 + 5;
+  // 先隐藏加入 DOM，测量实际宽度后再均匀分布位置
+  el.style.visibility = 'hidden';
+  el.style.animation = 'none';           // 暂停动画，定位完成再启动
+  bubbleContainer.appendChild(el);
+  const bw = el.offsetWidth;           // 气泡实际像素宽度
+  const sw = window.innerWidth;        // 屏幕宽度
+  const maxLeftPx = Math.max(0, sw - bw - 10);  // 右边缘不超出屏幕
+  // 在安全范围内随机取位置，保证左右均匀分布
+  const leftPx = maxLeftPx > 0 ? Math.random() * maxLeftPx : 0;
+  el.style.left = leftPx + 'px';
+  el.style.visibility = '';
+
   const duration = Math.random() * 8 + 14;
-  const drift = (Math.random() - 0.5) * 80;
+  const drift = (Math.random() - 0.5) * Math.min(bw * 0.3, 40);
   const size = Math.random() * 0.3 + 0.8;
 
-  el.style.left = left + '%';
+  el.style.animation = '';
   el.style.animationDuration = duration + 's';
   el.style.setProperty('--drift', drift + 'px');
   el.style.transform = `scale(${size})`;
