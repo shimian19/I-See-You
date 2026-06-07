@@ -1,0 +1,1098 @@
+/* ========== 全局基础样式 ========== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+  background: linear-gradient(135deg, #1a0024 0%, #3d0b37 25%, #6b1d4c 50%, #a8325a 75%, #d44a6e 100%);
+  background-size: 400% 400%;
+  background-attachment: fixed;
+  animation: gradientShift 20s ease infinite;
+  cursor: default;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ========== 背景渐变动画 ========== */
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  25% { background-position: 100% 0%; }
+  50% { background-position: 100% 100%; }
+  75% { background-position: 0% 100%; }
+}
+
+/* ========== Canvas 爱心粒子层 ========== */
+canvas#heartsCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ========== 气泡容器 ========== */
+.bubble-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+  transition: opacity 0.4s ease;
+}
+
+/* ========== 气泡样式 ========== */
+.bubble {
+  position: absolute;
+  bottom: -120px;
+  padding: 10px 20px;
+  border-radius: 50px;
+  max-width: 75vw;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff;
+  font-size: 16px;
+  white-space: normal;
+  word-break: keep-all;
+  pointer-events: auto;
+  cursor: pointer;
+  text-shadow: 0 0 12px rgba(255, 150, 180, 0.6);
+  box-shadow: 0 4px 20px rgba(255, 100, 150, 0.15), inset 0 0 20px rgba(255, 255, 255, 0.08);
+  transition: transform 0.4s ease, background 0.4s ease, box-shadow 0.4s ease, border-radius 0.4s ease;
+  animation: rise linear forwards;
+}
+
+.bubble .bubble-text {
+  transition: opacity 0.3s ease;
+}
+
+.bubble.paused {
+  animation-play-state: paused;
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 8px 30px rgba(255, 100, 150, 0.4), inset 0 0 25px rgba(255, 255, 255, 0.15);
+  z-index: 10;
+}
+
+/* ========== 照片弹窗 ========== */
+.photo-popup {
+  position: fixed;
+  pointer-events: none;
+  z-index: 20;
+  opacity: 0;
+  transform: translate(-50%, 10px) scale(0.6);
+  transition: opacity 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.photo-popup.show {
+  opacity: 1;
+  transform: translate(-50%, -100%) scale(1);
+}
+
+.photo-popup img {
+  display: block;
+  width: 180px;
+  height: 180px;
+  border-radius: 18px;
+  object-fit: cover;
+  border: 3px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.45), 0 0 40px rgba(255, 100, 160, 0.3);
+  margin-bottom: 8px;
+}
+
+.photo-popup .photo-label {
+  display: none;
+}
+
+/* ========== 气泡上升动画 ========== */
+@keyframes rise {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(calc(-100vh - 120px)) translateX(var(--drift));
+    opacity: 0;
+  }
+}
+
+/* ========== 中央卡片 ========== */
+.card {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  padding: 52px 64px;
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow:
+    0 0 30px rgba(255, 107, 157, 0.35),
+    0 0 60px rgba(255, 107, 157, 0.12),
+    0 0 100px rgba(180, 150, 255, 0.08),
+    0 20px 60px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  text-align: center;
+  overflow: hidden;
+  transition: opacity 0.4s ease;
+  animation:
+    cardFloat 5s ease-in-out infinite,
+    cardBorderPulse 4s ease-in-out infinite alternate;
+}
+
+/* 卡片对角线微光扫过 */
+.card::after {
+  content: '';
+  position: absolute;
+  top: -60%;
+  left: -60%;
+  width: 220%;
+  height: 220%;
+  background: linear-gradient(
+    135deg,
+    transparent 38%,
+    rgba(255, 255, 255, 0.02) 42%,
+    rgba(255, 255, 255, 0.07) 46%,
+    rgba(255, 255, 255, 0.02) 50%,
+    transparent 54%
+  );
+  transform: translateX(-100%) translateY(-100%);
+  animation: cardShimmer 5s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* 确保卡片内容在微光之上 */
+.card > * {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes cardFloat {
+  0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+  50% { transform: translate(-50%, -50%) translateY(-14px); }
+}
+
+@keyframes cardBorderPulse {
+  0% {
+    box-shadow:
+      0 0 25px rgba(255, 107, 157, 0.3),
+      0 0 50px rgba(255, 107, 157, 0.1),
+      0 0 90px rgba(180, 150, 255, 0.06),
+      0 20px 60px rgba(0, 0, 0, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+  40% {
+    box-shadow:
+      0 0 40px rgba(255, 180, 120, 0.45),
+      0 0 70px rgba(255, 107, 157, 0.18),
+      0 0 110px rgba(103, 232, 176, 0.1),
+      0 20px 60px rgba(0, 0, 0, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  }
+  70% {
+    box-shadow:
+      0 0 30px rgba(180, 150, 255, 0.4),
+      0 0 55px rgba(103, 232, 176, 0.1),
+      0 0 95px rgba(255, 107, 157, 0.12),
+      0 20px 60px rgba(0, 0, 0, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  }
+  100% {
+    box-shadow:
+      0 0 35px rgba(255, 107, 157, 0.35),
+      0 0 60px rgba(255, 180, 120, 0.12),
+      0 0 100px rgba(180, 150, 255, 0.08),
+      0 20px 60px rgba(0, 0, 0, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+}
+
+@keyframes cardShimmer {
+  0%, 100% {
+    transform: translateX(-100%) translateY(-100%);
+  }
+  50% {
+    transform: translateX(80%) translateY(80%);
+  }
+}
+
+/* ---- 图标 ---- */
+.card .icon {
+  font-size: 38px;
+  margin-bottom: 18px;
+  filter: drop-shadow(0 0 20px rgba(255, 150, 200, 0.5));
+  animation: heartbeat 1.2s ease-in-out infinite, iconGlow 2.5s ease-in-out infinite alternate;
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  15% { transform: scale(1.25); }
+  30% { transform: scale(1); }
+  45% { transform: scale(1.2); }
+  60% { transform: scale(1); }
+}
+
+@keyframes iconGlow {
+  0%   { filter: drop-shadow(0 0 16px rgba(255, 150, 200, 0.4)); }
+  100% { filter: drop-shadow(0 0 32px rgba(255, 180, 120, 0.7)); }
+}
+
+/* ---- 标题（渐变流光文字） ---- */
+.card h1 {
+  font-size: 44px;
+  font-weight: 700;
+  margin-bottom: 14px;
+  letter-spacing: 6px;
+  background: linear-gradient(135deg, #ffb3c6 0%, #fff 35%, #ffd56b 65%, #ffb3c6 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  /* text-shadow 在 -webkit-text-fill-color: transparent 时仍会渲染在文字背后 → 自然发光 */
+  text-shadow: 0 0 40px rgba(255, 150, 200, 0.5), 0 0 80px rgba(255, 150, 200, 0.2);
+  animation: textShine 4s linear infinite;
+}
+
+@keyframes textShine {
+  to { background-position: 200% center; }
+}
+
+/* ---- 副标题 ---- */
+.card p.sub {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.72);
+  letter-spacing: 3px;
+  line-height: 1.7;
+  font-weight: 300;
+}
+
+/* ---- 分隔线 ---- */
+.card .divider {
+  width: 80px;
+  height: 1.5px;
+  background: linear-gradient(90deg, transparent, rgba(255, 150, 200, 0.6) 30%, rgba(255, 255, 255, 0.5) 50%, rgba(255, 180, 120, 0.6) 70%, transparent);
+  margin: 22px auto;
+  border-radius: 1px;
+}
+
+/* ========== 点击爱心动画 ========== */
+.click-heart {
+  position: fixed;
+  pointer-events: none;
+  z-index: 6;
+  font-size: 28px;
+  animation: heartPop 1.5s ease-out forwards;
+}
+
+@keyframes heartPop {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 1;
+  }
+  40% {
+    transform: translate(-50%, -50%) scale(1.4);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, calc(-50% - 120px)) scale(0.3);
+    opacity: 0;
+  }
+}
+
+/* ========== 移动端响应式 ========== */
+@media (max-width: 600px) {
+  .card {
+    padding: 36px 26px;
+    border-radius: 22px;
+  }
+  .card h1 {
+    font-size: 30px;
+    letter-spacing: 4px;
+  }
+  .card p.sub {
+    font-size: 15px;
+    letter-spacing: 2px;
+  }
+  .card .icon {
+    font-size: 36px;
+  }
+  .card .divider {
+    width: 60px;
+    margin: 18px auto;
+  }
+  .carousel-wrapper {
+    height: 110px;
+    margin: 12px 0 10px;
+  }
+  .carousel-item {
+    width: 62px;
+    height: 62px;
+    margin-left: -31px;
+    margin-top: -31px;
+    border-radius: 12px;
+  }
+  .bubble {
+    font-size: 14px;
+    padding: 8px 14px;
+    max-width: 68vw;
+  }
+  .photo-popup img {
+    width: 140px;
+    height: 140px;
+  }
+  .counter {
+    font-size: 13px;
+  }
+  .counter-toggle {
+    bottom: 10px;
+    right: 14px;
+    font-size: 14px;
+  }
+}
+
+/* ========== 星空背景层 ========== */
+.stars {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.star-dot {
+  position: absolute;
+  border-radius: 50%;
+  background: #fff;
+  animation: twinkle var(--twinkle-duration) ease-in-out infinite;
+  animation-delay: var(--twinkle-delay);
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.2; transform: scale(1); }
+  50% { opacity: 0.9; transform: scale(1.5); }
+}
+
+/* ========== 光标光晕跟随（仅桌面端） ========== */
+.cursor-glow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 3;
+  background: radial-gradient(circle, rgba(255, 150, 200, 0.15) 0%, rgba(255, 150, 200, 0.05) 40%, transparent 70%);
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.cursor-glow.visible {
+  opacity: 1;
+}
+
+@media (max-width: 768px) {
+  .cursor-glow {
+    display: none;
+  }
+}
+
+/* ========== 相恋天数计数器 ========== */
+.counter {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.65);
+  margin-top: 8px;
+  letter-spacing: 1px;
+  transition: opacity 0.4s ease;
+}
+
+.counter.hidden {
+  opacity: 0;
+}
+
+.counter-toggle {
+  position: absolute;
+  bottom: 14px;
+  right: 18px;
+  font-size: 16px;
+  cursor: pointer;
+  opacity: 0.4;
+  transition: opacity 0.3s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  z-index: 10;
+}
+
+.counter-toggle:hover {
+  opacity: 0.85;
+}
+
+.counter-toggle.toggled-off {
+  opacity: 0.2;
+}
+
+/* ========== 打字机光标闪烁 ========== */
+.typing-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: rgba(255, 255, 255, 0.8);
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  animation: blink 0.8s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* ========== 气泡分类配色 ========== */
+.bubble.cat-sweet {
+  background: rgba(255, 150, 180, 0.18);
+  border-color: rgba(255, 150, 180, 0.35);
+  text-shadow: 0 0 12px rgba(255, 150, 180, 0.7);
+}
+
+.bubble.cat-miss {
+  background: rgba(180, 150, 230, 0.18);
+  border-color: rgba(180, 150, 230, 0.35);
+  text-shadow: 0 0 12px rgba(180, 150, 230, 0.7);
+}
+
+.bubble.cat-promise {
+  background: rgba(255, 200, 140, 0.18);
+  border-color: rgba(255, 200, 140, 0.35);
+  text-shadow: 0 0 12px rgba(255, 200, 140, 0.7);
+}
+
+.bubble.cat-playful {
+  background: rgba(150, 230, 200, 0.18);
+  border-color: rgba(150, 230, 200, 0.35);
+  text-shadow: 0 0 12px rgba(150, 230, 200, 0.7);
+}
+
+/* ========== 迷你烟花粒子（Canvas 绘制，此处为备用 DOM 样式） ========== */
+.firework-particle {
+  position: fixed;
+  pointer-events: none;
+  z-index: 15;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  animation: fireworkBurst 1.2s ease-out forwards;
+}
+
+@keyframes fireworkBurst {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--fvx), var(--fvy)) scale(0);
+    opacity: 0;
+  }
+}
+
+/* ========== 保存照片提示 ========== */
+.save-hint {
+  position: fixed;
+  pointer-events: none;
+  z-index: 25;
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  font-size: 13px;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.25s ease;
+}
+
+.save-hint.show {
+  opacity: 1;
+}
+
+/* ========== 点击涟漪 ========== */
+.ripple {
+  position: fixed;
+  pointer-events: none;
+  z-index: 8;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.08);
+  transform: translate(-50%, -50%) scale(0);
+  animation: rippleExpand 0.8s ease-out forwards;
+}
+
+@keyframes rippleExpand {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(4);
+    opacity: 0;
+  }
+}
+
+/* ========== 3D 照片轮播 ========== */
+.carousel-wrapper {
+  width: 100%;
+  height: 150px;
+  perspective: 600px;
+  margin: 16px 0 14px;
+  position: relative;
+  overflow: visible;
+}
+
+.carousel-stage {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.6s ease;
+}
+
+.carousel-item {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 90px;
+  height: 90px;
+  margin-left: -45px;
+  margin-top: -45px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), 0 0 20px rgba(255, 150, 180, 0.25);
+  cursor: grab;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.carousel-item:hover {
+  border-color: rgba(255, 200, 150, 0.7);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 180, 120, 0.4);
+}
+
+.carousel-item:active {
+  cursor: grabbing;
+}
+
+.carousel-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ========== 滚动指示器 ========== */
+.scroll-hint {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 13px;
+  letter-spacing: 2px;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+
+.scroll-hint.hidden {
+  opacity: 0;
+}
+
+.scroll-arrow {
+  font-size: 22px;
+  margin-top: 4px;
+  animation: bounceDown 1.5s ease-in-out infinite;
+}
+
+@keyframes bounceDown {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(10px); }
+}
+
+/* ========== 时间线 ========== */
+.timeline {
+  position: relative;
+  z-index: 4;
+  padding: 60px 20px 40px;
+  margin-top: calc(100vh + 40px);
+  min-height: 60vh;
+}
+
+/* 时间线背景装饰 */
+.timeline::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: -1;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(255,150,200,0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(180,150,255,0.05) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(255,200,140,0.05) 0%, transparent 50%);
+}
+
+.timeline-title {
+  text-align: center;
+  color: #fff;
+  font-size: 30px;
+  letter-spacing: 6px;
+  margin-bottom: 16px;
+  text-shadow: 0 0 30px rgba(255, 150, 200, 0.5);
+}
+
+.timeline-subtitle {
+  text-align: center;
+  color: rgba(255,255,255,0.45);
+  font-size: 14px;
+  letter-spacing: 3px;
+  margin-bottom: 50px;
+}
+
+.timeline-line {
+  position: absolute;
+  left: 50%;
+  top: 180px;
+  bottom: 40px;
+  width: 2px;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 150, 200, 0.7),
+    rgba(255, 150, 200, 0.4) 30%,
+    rgba(180, 150, 255, 0.4) 60%,
+    rgba(255, 200, 140, 0.2)
+  );
+  transform: translateX(-50%);
+}
+
+.timeline-list {
+  position: relative;
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+.timeline-event {
+  position: relative;
+  width: 43%;
+  padding: 22px 24px 18px;
+  margin-bottom: 44px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.7s ease, transform 0.7s ease, background 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+}
+
+.timeline-event.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 悬浮放大微动 */
+.timeline-event:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 150, 180, 0.35);
+  box-shadow: 0 12px 40px rgba(255, 100, 160, 0.18);
+  transform: translateY(-2px);
+}
+
+.timeline-event.visible:hover {
+  transform: translateY(-2px);
+}
+
+.timeline-event:nth-child(odd) {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+.timeline-event:nth-child(even) {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+/* 时间线圆点 */
+.timeline-event::after {
+  content: '';
+  position: absolute;
+  top: 32px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(255, 150, 200, 0.85);
+  border: 3px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 16px rgba(255, 150, 200, 0.6), 0 0 4px rgba(255, 255, 255, 0.3);
+  transition: box-shadow 0.35s ease, background 0.35s ease;
+}
+
+.timeline-event:hover::after {
+  box-shadow: 0 0 24px rgba(255, 150, 200, 0.9), 0 0 8px rgba(255, 255, 255, 0.5);
+  background: rgba(255, 180, 210, 1);
+}
+
+.timeline-event:nth-child(odd)::after {
+  right: -38px;
+}
+
+.timeline-event:nth-child(even)::after {
+  left: -38px;
+}
+
+/* 事件 emoji */
+.timeline-event .event-emoji {
+  position: absolute;
+  top: -16px;
+  right: 16px;
+  font-size: 28px;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.2));
+}
+
+.timeline-event .event-date {
+  font-size: 13px;
+  color: rgba(255, 150, 200, 0.85);
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.timeline-event .event-title {
+  font-size: 19px;
+  color: #fff;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.timeline-event .event-desc {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.7;
+  letter-spacing: 0.5px;
+}
+
+/* 时间线装饰粒子 */
+.timeline-particle {
+  position: fixed;
+  pointer-events: none;
+  z-index: 4;
+  font-size: 16px;
+  animation: particleDrift linear forwards;
+}
+
+@keyframes particleDrift {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.7;
+  }
+  90% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate(var(--tdx), var(--tdy)) rotate(var(--tr));
+    opacity: 0;
+  }
+}
+
+/* 结尾横幅 */
+.timeline-footer {
+  text-align: center;
+  padding: 60px 20px 50px;
+  position: relative;
+  z-index: 4;
+}
+
+.timeline-footer .footer-hearts {
+  font-size: 36px;
+  letter-spacing: 8px;
+  animation: heartbeat 1.2s ease-in-out infinite;
+  margin-bottom: 20px;
+}
+
+.timeline-footer .footer-text {
+  font-size: 24px;
+  color: #fff;
+  letter-spacing: 4px;
+  text-shadow: 0 0 30px rgba(255, 150, 200, 0.5);
+  margin-bottom: 10px;
+}
+
+.timeline-footer .footer-sub {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.45);
+  letter-spacing: 2px;
+}
+
+/* ========== 照片闪回层 ========== */
+.flashback-layer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* 柔光暗角遮罩 */
+.flashback-vignette {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 3;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(10, 0, 20, 0.6) 85%);
+}
+
+/* 双槽位照片，通过 CSS animation 实现交叉溶解 */
+.flashback-photo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 70vw;
+  height: 50vh;
+  object-fit: cover;
+  border-radius: 28px;
+  opacity: 0;
+  filter: blur(4px) brightness(0.4);
+  mask-image: radial-gradient(ellipse at center, black 45%, transparent 78%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 45%, transparent 78%);
+  will-change: transform, opacity, filter;
+}
+
+/* 进入动画 —— 时长由 JS 通过 CSS 变量注入，默认 0.5s */
+.flashback-photo.enter {
+  animation: flashbackIn var(--fb-enter-dur, 0.5s) ease-out forwards;
+}
+
+/* 离开动画 —— 时长由 JS 通过 CSS 变量注入，默认 0.35s */
+.flashback-photo.leave {
+  animation: flashbackOut var(--fb-leave-dur, 0.35s) ease-in forwards;
+}
+
+/* 停留期间 Ken Burns —— 时长默认 5s */
+.flashback-photo.hold {
+  opacity: 1;
+  filter: blur(0px) brightness(0.5);
+  transform: translate(-50%, -50%) scale(0.96);
+  animation: kenBurns var(--fb-hold-dur, 5s) ease-in-out forwards;
+}
+
+@keyframes flashbackIn {
+  0% {
+    opacity: 0;
+    filter: blur(6px) brightness(0.3);
+    transform: translate(-50%, -50%) scale(0.94);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0px) brightness(0.5);
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+}
+
+@keyframes flashbackOut {
+  0% {
+    opacity: 1;
+    filter: blur(0px) brightness(0.5);
+  }
+  100% {
+    opacity: 0;
+    filter: blur(4px) brightness(0.2);
+  }
+}
+
+@keyframes kenBurns {
+  0% {
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.04);
+  }
+}
+
+@media (max-width: 600px) {
+  .flashback-photo {
+    width: 92vw;
+    height: 35vh;
+    border-radius: 20px;
+  }
+}
+
+/* 移动端时间线改为单列 */
+@media (max-width: 600px) {
+  .timeline-line {
+    left: 24px;
+  }
+  .timeline-event {
+    width: 85%;
+    margin-left: 50px !important;
+    margin-right: auto !important;
+  }
+  .timeline-event::after {
+    left: -37px !important;
+    right: auto !important;
+  }
+  .timeline-title {
+    font-size: 22px;
+  }
+}
+
+/* ========== 逃跑按钮 ========== */
+.escape-btn {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+  transition: opacity 0.4s ease, background 0.15s ease, border-color 0.15s ease, left 0.12s ease, top 0.12s ease;
+  padding: 10px 24px;
+  border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: all 0.15s ease;
+  outline: none;
+  font-family: inherit;
+}
+
+.escape-btn:hover {
+  background: rgba(255, 100, 150, 0.3);
+  border-color: rgba(255, 150, 180, 0.6);
+  color: #fff;
+}
+
+/* ========== 分享按钮 ========== */
+.share-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 30;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  outline: none;
+  font-family: inherit;
+  padding: 0;
+}
+
+.share-btn:hover {
+  background: rgba(255, 150, 200, 0.25);
+  border-color: rgba(255, 150, 180, 0.5);
+  transform: scale(1.1);
+}
+
+.share-btn span {
+  pointer-events: none;
+}
+
+/* 分享卡片预览弹窗 */
+.share-preview {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 50;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.share-preview.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.share-preview canvas {
+  border-radius: 18px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  max-width: 90vw;
+  max-height: 80vh;
+}
+
+.share-preview .close-btn {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  color: #fff;
+  font-size: 30px;
+  cursor: pointer;
+  z-index: 51;
+  opacity: 0.7;
+  transition: opacity 0.3s;
+}
+
+.share-preview .close-btn:hover {
+  opacity: 1;
+}
+
+.share-preview .save-tip {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+
